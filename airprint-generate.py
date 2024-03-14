@@ -53,7 +53,7 @@ except:
             from elementtree import Element, ElementTree, tostring
             etree = None
         except:
-            raise 'Failed to find python libxml or elementtree, please install one of those or use python >= 2.5'
+            raise ImportError('Failed to find python libxml or elementtree, please install one of those or use python >= 2.5')
 
 try:
     import cups
@@ -155,7 +155,7 @@ class AirPrintGenerate(object):
             
             printers = conn.getPrinters()
         
-            for p, v in printers.items():
+            for p, v in list(printers.items()):
                 if v['printer-is-shared']:
                     if self.verbose:
                      pprint.pprint(v)
@@ -271,14 +271,14 @@ class AirPrintGenerate(object):
             if self.adminurl or key != 'adminurl':
                 service_node.append(self.new_txtrecord_node('%s=%s' % (key, txt[key])))
 
-        source = printer['SOURCE'] if printer.has_key('SOURCE') else ''
+        source = printer['SOURCE'] if 'SOURCE' in printer else ''
 
         fname = '%s%s%s.service' % (self.prefix, '%s-' % source if len(source) > 0 else '', printer_name)
         
         if self.directory:
             fname = os.path.join(self.directory, fname)
         
-        f = open(fname, 'w')
+        f = open(fname, 'wb')
 
         if etree:
             tree.write(f, pretty_print=True, xml_declaration=True, encoding="UTF-8")
